@@ -18,16 +18,19 @@ public class AuthService {
     @Autowired
     private JwtUtils jwtUtils;
 
-    public AcessDto login (AuthDto authDto){
-      try {
-          UsernamePasswordAuthenticationToken userAuth = new UsernamePasswordAuthenticationToken(authDto.getUsername(), authDto.getPassword());
-          Authentication authentication = authenticationManager.authenticate(userAuth);
-          UserDetailImpl userAuthenticate = (UserDetailImpl) authentication.getPrincipal();
-          String token= jwtUtils.generateTokenFromUserDetailsImpl(userAuthenticate);
-          AcessDto acessDto = new AcessDto(token);
-          return acessDto;
-      }catch (BadCredentialsException e){
-          throw new BadCredentialsException("Bad credentials");
-      }
-      }
+    public AcessDto login(AuthDto authDto) {
+        try {
+            UsernamePasswordAuthenticationToken userAuth = new UsernamePasswordAuthenticationToken(authDto.getUsername(), authDto.getPassword());
+            Authentication authentication = authenticationManager.authenticate(userAuth);
+
+            // Aqui você já está fazendo o cast para UserDetailImpl, o que está correto
+            UserDetailImpl userAuthenticate = (UserDetailImpl) authentication.getPrincipal();
+
+            String token = jwtUtils.generateTokenFromUserDetailsImpl(userAuthenticate);
+            AcessDto acessDto = new AcessDto(token);
+            return acessDto;
+        } catch (BadCredentialsException e) {
+            throw new BadCredentialsException("Bad credentials");
+        }
+    }
 }

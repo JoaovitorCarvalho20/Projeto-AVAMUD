@@ -8,7 +8,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-@Service // Certifica-se de que a classe é registrada como um bean Spring
+import java.util.ArrayList;
+import java.util.Optional;
+
+@Service
 public class UserDetailServiceImpl implements UserDetailsService {
 
     @Autowired
@@ -16,15 +19,13 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Procura o usuário no repositório pelo nome de login
-        User user = userRepository.findByLogin(username);
+        Optional<User> userOptional = userRepository.findByLogin(username);
 
-        // Verifica se o usuário foi encontrado
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
+        // Descompacte o Optional
+        User user = userOptional.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // Constrói e retorna UserDetailImpl com base no usuário encontrado
-        return UserDetailImpl.build(user);
+        // Retorne sua implementação personalizada
+        return UserDetailImpl.build(user); // Usando o método estático que você criou
     }
+
 }

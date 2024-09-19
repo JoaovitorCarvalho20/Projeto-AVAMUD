@@ -2,10 +2,8 @@ package com.avamud.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
@@ -23,7 +21,9 @@ public class Payment {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private BigDecimal valor;
+    @NotNull
     private LocalDateTime dataPagamento;
 
     @ManyToOne

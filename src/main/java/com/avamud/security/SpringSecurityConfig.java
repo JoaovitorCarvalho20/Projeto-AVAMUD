@@ -44,26 +44,19 @@ public class SpringSecurityConfig {
     // Define a cadeia de filtros de segurança para a aplicação
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // Habilita CORS (Cross-Origin Resource Sharing) com configurações padrão
-        http.cors(Customizer.withDefaults());
-
-        // Desabilita CSRF (Cross-Site Request Forgery), porque o sistema usará JWT e não mantém estado de sessão
-        http.csrf(csrf -> csrf.disable())
-
-                // Define como tratar erros de autenticação, utilizando a classe AuthEntrypointJwt
+        http.cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntrypointJwt))
-
-                // Configura a aplicação para ser stateless, sem manter sessão no servidor (próprio de sistemas que usam JWT)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/users").permitAll()
+                        .requestMatchers("/payments/**").authenticated() // Permitir apenas para autenticados
+                        .anyRequest().authenticated());
 
-                // Autoriza todas as requisições que tenham a URL começando com "/auth/**", como login ou registro
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll()
-                                .requestMatchers("/users").permitAll()
-                                .anyRequest().authenticated());
+        http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
 
-       http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
-
-        // Constrói e retorna a configuração do filtro de segurança
         return http.build();
     }
+
 }
